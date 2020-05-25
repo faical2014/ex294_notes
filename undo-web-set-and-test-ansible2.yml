@@ -1,0 +1,34 @@
+---
+- name: UnSetup WEB server
+  hosts: ansible2.example.com
+  tasks:
+  - name: Delete httpd service from firewalld
+    firewalld:
+      service: http
+      permanent: yes
+      state: disabled
+      immediate: yes
+  
+  - name: Remove Welcome Page
+    file:
+      path: /var/www/html/index.html
+      state: absent
+  
+  - name: Uninstall httpd
+    yum:
+      name: httpd
+      state: absent
+
+  
+
+- name: Test WEB server
+  hosts: localhost
+  become: no
+  tasks:
+  - name: Connect to the WEB server
+    uri:
+      url: http://ansible2.example.com
+      return_content: yes
+      status_code: 200
+    tags: urltest
+...

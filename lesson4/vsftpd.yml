@@ -1,0 +1,38 @@
+---
+- name: Deploy vSFTPd
+  hosts: ansible2.example.com
+  tasks:
+  - name: Install vsftpd
+    yum: name=vsftpd
+
+  - name: Enable vsftpd
+    service: name=vsftpd enabled=yes
+          
+  - name: Create README file
+    copy:
+      content: "Free Downloads For Everybody"
+      dest: /var/ftp/pub/README
+      force: no
+      mode: 0444
+    tags: createfile
+
+- name: Check DNS
+  hosts: web
+  tasks:
+  - name: Check resolv.conf File
+    command: cat /etc/resolv.conf
+    register: resolvoutput
+    tags: resolv
+
+  - name: resolv.conf output
+    debug:
+      msg: "The resolv.conf content is {{ resolvoutput.stdout }}"
+    tags: resolvcontent
+...
+
+#force:
+	Influence whether the remote file must always be replaced.
+        If `yes', the remote file will be replaced when contents are different than the source.
+        If `no', the file will only be transferred if the destination does not exist.
+        (Aliases: thirsty)[Default: True]
+        type: bool

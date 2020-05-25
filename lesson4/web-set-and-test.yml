@@ -1,0 +1,47 @@
+---
+- name: Setup WEB server
+  hosts: ansible1.example.com
+  tasks:
+  - name: Install httpd and firewalld
+    yum:
+      name:
+        - httpd
+        - firewalld
+      state: latest
+
+  - name: Install Welcome Page
+    copy:
+      content: 'Hello World on {{ ansible_hostname }}'
+      dest: /var/www/html/index.html
+      force: yes
+
+  - name: Enable and Start WEB services
+    service:
+      name: httpd
+      enabled: yes
+      state: started
+
+  - name: Enable and Start Firewalld services
+    service:
+      name: firewalld
+      enabled: yes
+      state: started
+
+  - name: Add httpd to firewalld
+    firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+      immediate: yes
+
+- name: Test WEB server
+  hosts: localhost
+  become: no
+  tasks:
+  - name: Connect to the WEB server
+    uri:
+      url: http://ansible1.example.com
+      return_content: yes
+      status_code: 200
+    tags: urltest
+...
